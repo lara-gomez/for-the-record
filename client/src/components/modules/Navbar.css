@@ -1,0 +1,9 @@
+.NavBar-container {
+  padding: var(--m) var(--m);
+  background: linear-gradient(#252525ab, #1e1e1e00);
+}
+
+.NavBar-title {
+  color: pink;
+  font-size: 20px;
+}
