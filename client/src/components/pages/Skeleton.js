@@ -4,6 +4,7 @@ import { GoogleOAuthProvider, GoogleLogin, googleLogout } from "@react-oauth/goo
 import "../../utilities.css";
 import "./Skeleton.css";
 import NavBar from "../modules/Navbar.js";
+import Home from "./Home.js";
 
 //TODO: REPLACE WITH YOUR OWN CLIENT_ID
 const GOOGLE_CLIENT_ID = "467776562867-a4odtqniap9rj5t08m9md23jd53vaode.apps.googleusercontent.com";
@@ -42,7 +43,8 @@ const Skeleton = ({ userId, handleLogin, handleLogout }) => {
     //     Check out this getting started guide
     //   </a>
     // </GoogleOAuthProvider>
-    <>{/* <NavBar /> */}</>
+    // <>{/* <NavBar /> */}</>
+    <Home />
   );
 };
 

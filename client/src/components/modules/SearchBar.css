@@ -1,0 +1,20 @@
+.SearchBar {
+  position: absolute;
+  top: 55%;
+  left: 35%;
+}
+
+.SearchBar-input {
+  flex-grow: 1;
+  border: var(--darkgrey) 1px solid;
+  border-radius: var(--xs) 0 0 var(--xs);
+  transition: box-shadow 0.1s;
+}
+
+.SearchBar-button {
+  color: var(--primary);
+  border: var(--primary) 1px solid;
+  border-radius: 0 var(--xs) var(--xs) 0;
+  background: none;
+  transition: color 0.1s, background 0.1s;
+}

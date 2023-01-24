@@ -1,0 +1,17 @@
+.Home-container {
+  background-color: var(--primary);
+}
+.Home-title {
+  font-size: 40px;
+  font-weight: 300;
+}
+
+.logo {
+  height: auto;
+  width: 900px;
+  display: flex;
+  margin: auto;
+  position: absolute;
+  top: 40%;
+  left: 17.5%;
+}
