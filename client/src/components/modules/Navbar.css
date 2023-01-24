@@ -1,6 +1,6 @@
 .NavBar-container {
-  padding: var(--m) var(--m);
-  background: linear-gradient(#252525ab, #1e1e1e00);
+  padding: var(--l) var(--m);
+  background: linear-gradient(#28282837, white);
 }
 
 .NavBar-title {

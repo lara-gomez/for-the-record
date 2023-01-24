@@ -1,7 +1,5 @@
-.SearchBar {
-  position: absolute;
-  top: 55%;
-  left: 35%;
+.SearchBar-position {
+  margin: 25px;
 }
 
 .SearchBar-input {
@@ -9,6 +7,8 @@
   border: var(--darkgrey) 1px solid;
   border-radius: var(--xs) 0 0 var(--xs);
   transition: box-shadow 0.1s;
+  font-size: medium;
+  font-family: "Lato", sans-serif;
 }
 
 .SearchBar-button {
@@ -17,4 +17,6 @@
   border-radius: 0 var(--xs) var(--xs) 0;
   background: none;
   transition: color 0.1s, background 0.1s;
+  font-size: medium;
+  font-family: "Lato", sans-serif;
 }

@@ -16,10 +16,11 @@ import SearchBar from "../modules/SearchBar.js";
 
 const Home = () => {
   return (
-    <>
+    <div className="Home-container">
       <img src="logo.png" className="logo" />
       <SearchBar />
-    </>
+      <div className="site-description">search for songs. leave a review. share with friends.</div>
+    </div>
   );
 };
 

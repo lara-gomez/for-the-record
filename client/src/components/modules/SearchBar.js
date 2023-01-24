@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 
 import "./SearchBar.css";
+import "../../utilities.css";
 
 // import {getCred} from '../../../../server/spotify.js';
 // import {getTracks} from '../../../../server/spotify.js';
@@ -25,7 +26,7 @@ const SearchBar = () => {
   };
 
   return (
-    <div className="SearchBar u-textCenter">
+    <div className="u-textCenter SearchBar-position">
       <input
         type="search"
         name="q"
