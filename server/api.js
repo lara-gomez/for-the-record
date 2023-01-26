@@ -7,6 +7,10 @@
 |
 */
 
+
+
+
+
 const express = require("express");
 
 // import models so we can interact with the database
@@ -18,8 +22,13 @@ const auth = require("./auth");
 // api endpoints: all these paths will be prefixed with "/api/"
 const router = express.Router();
 
+const request = require("request");
+const dotenv = require("dotenv");
+
 //initialize socket
 const socketManager = require("./server-socket");
+
+dotenv.config();
 
 router.post("/login", auth.login);
 router.post("/logout", auth.logout);
@@ -39,7 +48,13 @@ router.post("/initsocket", (req, res) => {
   res.send({});
 });
 
-// Spotify API methods
+// ---------- SPOTIFY STUFF DOWN HERE -> ONLY SUPPORTS ONE USER at the moment.
+// TODO:  - Store user's tokens on the database to support multiple users.
+//        - Add functionality to get new tokens when they run out.
+//        - We can talk about these other tasks more if you need help. Make a piazza post or come to office hours.
+
+// Go to https://developer.spotify.com/dashboard/ and add this as a callback url "http://localhost:[YOUR FRONTEND PORT]/api/spotify/callback"
+// In this example, my frontend port is 5050. It may be yours as well since i just used the default weblab skeleton.
 
 let access_token = ""; // initiate access token
 const spotify_client_id = process.env.SPOTIFY_CLIENT_ID;

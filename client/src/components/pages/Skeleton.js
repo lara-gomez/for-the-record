@@ -11,6 +11,9 @@ const GOOGLE_CLIENT_ID = "467776562867-a4odtqniap9rj5t08m9md23jd53vaode.apps.goo
 
 const Skeleton = ({ userId, handleLogin, handleLogout }) => {
   return (
+    <div>
+      
+    </div>
     // <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
     //   {userId ? (
     //     <button
@@ -44,7 +47,6 @@ const Skeleton = ({ userId, handleLogin, handleLogout }) => {
     //   </a>
     // </GoogleOAuthProvider>
     // <>{/* <NavBar /> */}</>
-    <Home />
   );
 };
 
