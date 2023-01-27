@@ -6,6 +6,7 @@ import NotFound from "./pages/NotFound.js";
 import NavBar from "./modules/Navbar.js";
 import Spotify from "./pages/Spotify.js";
 import Home from "./pages/Home.js";
+import Feed from "./pages/Feed.js";
 
 import "../utilities.css";
 
@@ -47,10 +48,10 @@ const App = () => {
     <>
       <NavBar />
       <Router>
-        {/* <Skeleton path="/" handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} /> */}
         <Spotify path="/spotifyPage" />
         <NotFound default />
         <Home path="/"/>
+        <Feed path="/feed"/>
       </Router>
     </>
   );

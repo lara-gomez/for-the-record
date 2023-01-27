@@ -1,4 +1,5 @@
 import React, { useState, useEffect} from "react";
+import Song from "./Song.js";
 
 import "./SearchBar.css";
 import "../../utilities.css";
@@ -7,6 +8,8 @@ const SearchBar = () => {
   const [searchInput, setSearchInput] = useState("");
   const [songs, setSongs] = useState([]);
   const [token, setToken] = useState("");
+  const [songComponent, setSongComponent] = useState(undefined);
+  //check if token expired
   useEffect(() => {
     async function getToken() {
       console.log("doing stuff");
@@ -24,29 +27,14 @@ const SearchBar = () => {
   //const [songs, setSongs] = useState([]);
   //event = user types in search box
   const handleChange = (e) => {
-    //including "target" gets current val
     setSearchInput(e.target.value);
-    //getTracks(searchInput).then(res=>res.json).then(data=>console.log(data))
-    //getTracks(searchInput, setSongs);
-    //console.log(songs);
-    // setObject(getTracks(searchInput));
-    // console.log(object)
   };
 
   //event = user presses submit
   const handleSubmit = (e) => {
+    setSongComponent(undefined);
     getSong(searchInput);
   };
-
-  let songsList = null;
-  if(songs.length > 0){
-    songsList = songs.map((songObj) => (
-      <h2>{songObj}</h2>
-    ));
-  }
-  else{
-    songsList = null;
-  }
 
   const getSong = async (songName) => {
     const url = `https://api.spotify.com/v1/search?q=${songName}&type=track&market=US`
@@ -60,14 +48,37 @@ const SearchBar = () => {
       // eslint-disable-next-line arrow-parens
     }).then(async (spotifyServerResponse) => {
       const parsedResponse = await spotifyServerResponse.json();
-      const items = parsedResponse.tracks.items;
+      const items = parsedResponse.tracks.items ?? undefined;
       const tracks = [];
+      //create array of track info(name, artists, img)
       for(let i = 0; i < items.length; i++){
         let track = items[i];
-        let artists = track.artists;
-        for(let j = 0; j < artists.length; j++){
-          tracks.push(track.name, ' by ', artists[j].name);
+        let a = track.artists;
+        let artists = [];
+        //create array with proper display of artists
+        for(let j = 0; j < a.length; j++){
+          if(j > 0){
+            if(j === a.length - 1){
+              if(a.length === 2){
+                artists.push(' and ', a[j].name)
+              }
+              else{
+                artists.push(', and ', a[j].name)
+              }
+            }
+            else{
+              artists.push(', ', a[j].name)
+            }
+          }
+          else{
+            artists.push(a[j].name);
+          }
         }
+        tracks.push({
+          name: track.name,
+          artists: artists,
+          image: track.album.images[0].url,
+        });
       }
       setSongs(tracks);
       console.log(songs);
@@ -88,7 +99,27 @@ const SearchBar = () => {
       <button type="submit" className="SearchBar-button u-pointer" value="Submit" onClick={handleSubmit}>
         Submit
       </button>
-      {songsList}
+      <div className="Dropdown-container">
+      {songs.map((song) => (
+        <div>
+          <button type="button" onClick={() => {
+            setSongComponent(
+            <Song
+              name={song.name}
+              artists={song.artists}
+              image={song.image}
+            />
+            )
+            console.log(song);
+          }}>
+            {song.name} by {song.artists}
+          </button>
+        </div>
+      ))}
+      </div>
+      {songComponent !== undefined &&
+        <div>{songComponent}</div>
+      }
     </div>
   );
 };

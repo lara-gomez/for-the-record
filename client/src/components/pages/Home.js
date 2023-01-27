@@ -1,9 +1,9 @@
 import React, { useState } from "react";
+import SearchBar from "../modules/SearchBar.js";
 
 import "../../utilities.css";
 import "./Home.css";
 
-import SearchBar from "../modules/SearchBar.js";
 // const Home = () => {
 //   return (
 //     <div className="Home-container">
