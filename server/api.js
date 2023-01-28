@@ -7,10 +7,6 @@
 |
 */
 
-
-
-
-
 const express = require("express");
 
 // import models so we can interact with the database
@@ -59,7 +55,7 @@ router.post("/initsocket", (req, res) => {
 let access_token = ""; // initiate access token
 const spotify_client_id = process.env.SPOTIFY_CLIENT_ID;
 const spotify_client_secret = process.env.SPOTIFY_CLIENT_SECRET;
-const callback_uri = "http://localhost:5050/api/spotify/callback";
+const callback_uri = "https://fortherecord.herokuapp.com/api/spotify/callback";
 /**
  * Generates a secure random token (https://stackoverflow.com/questions/8855687/secure-random-token-in-node-js)
  */
@@ -116,6 +112,7 @@ router.get("/spotify/callback", (req, res) => {
   request.post(authOptions, function (error, response, body) {
     if (!error && response.statusCode === 200) {
       access_token = body.access_token; // this is the access token that you will use to send to the Spotify API anytime you send them an API call.
+      setCredentials(access_token);
       res.redirect("/"); // sends user back to the home page after a token is fetched. Up to you to change this to whatever path you want.
     }
   });
@@ -136,7 +133,52 @@ router.get("/spotify/token", (req, res) => {
 // | write your API methods below!|
 // |------------------------------|
 
+//logging in stuff
+// router.post("/setuser", (req, res) => {
+//   setCredentials(req.token);
+// });
+
+function getOrCreateUser(user) {
+  // the "sub" field means "subject", which is a unique identifier for each user
+  return User.findOne({ spotify_id: user.spotify_id }).then((existingUser) => {
+    if (existingUser) return existingUser;
+
+    const newUser = new User({
+      name: user.display_name,
+      spotify_id: user.id,
+      profile_pic: user.images,
+    });
+
+    return newUser.save();
+  });
+}
+
+const setCredentials = (token) => {
+  const url = `https://api.spotify.com/v1/me`
+  const credentials = fetch(url, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    }
+    // eslint-disable-next-line arrow-parens
+  }).then((response) => {
+    return response.json();
+  }).then((credentials) => {
+    console.log(credentials);
+    userObj = {
+      display_name: credentials.display_name,
+      id: credentials.id,
+      images: credentials.images,
+    };
+    console.log(userObj);
+    getOrCreateUser(userObj);
+  })
+};
+
 // anything else falls to this "not found" case
+
 router.all("*", (req, res) => {
   console.log(`API route not found: ${req.method} ${req.url}`);
   res.status(404).send({ msg: "API route not found" });

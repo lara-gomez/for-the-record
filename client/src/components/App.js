@@ -46,7 +46,7 @@ const App = () => {
 
   return (
     <>
-      <NavBar />
+      <NavBar/>
       <Router>
         <Spotify path="/spotifyPage" />
         <NotFound default />
