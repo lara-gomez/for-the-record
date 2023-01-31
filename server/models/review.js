@@ -1,11 +1,10 @@
+const { isInteger } = require("core-js/core/number");
 const mongoose = require("mongoose");
 
 const ReviewSchema = new mongoose.Schema({
   creator_id: String,
-  creator_name: String,
-  parent: String,
-  review_content: String,
-  rating: Number,
+  content: String,
+  //likes: ,
 });
 
 // compile model from schema

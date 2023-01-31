@@ -2,9 +2,9 @@ const mongoose = require("mongoose");
 const { internalIP } = require("webpack-dev-server");
 
 const SongSchema = new mongoose.Schema({
-  _id: String,
-  parent: String, //parent is albums
-  //likes: integer,
+  id: String,
+  //parent: String, //parent is albums
+  likes: integer,
   reviews: Array,
   // album: {
   //   type: String,

@@ -19,34 +19,50 @@ import { get, post } from "../utilities";
  */
 const App = () => {
   const [userId, setUserId] = useState(undefined);
+  const [token, setToken] = useState(null);
 
   useEffect(() => {
-    get("/api/whoami").then((user) => {
-      if (user._id) {
-        // they are registed in the database, and currently logged in.
-        setUserId(user._id);
+    async function getToken() {
+      console.log("doing stuff");
+      const response = await fetch("/api/spotify/token");
+      const json = await response.json();
+      if (response.status === 200) {
+        setToken(json.access_token);
+        console.log(json.access_token);
+      } else {
+        console.log("error with token");
       }
-    });
+    }
   }, []);
 
-  const handleLogin = (credentialResponse) => {
-    const userToken = credentialResponse.credential;
-    const decodedCredential = jwt_decode(userToken);
-    console.log(`Logged in as ${decodedCredential.name}`);
-    post("/api/login", { token: userToken }).then((user) => {
-      setUserId(user._id);
-      post("/api/initsocket", { socketid: socket.id });
-    });
-  };
+  // useEffect(() => {
+  //   get("/api/whoami").then((user) => {
+  //     if (user._id) {
+  //       // they are registed in the database, and currently logged in.
+  //       setUserId(user._id);
+  //     }
+  //   });
+  // }, []);
 
-  const handleLogout = () => {
-    setUserId(undefined);
-    post("/api/logout");
-  };
+  // const handleLogin = (credentialResponse) => {
+  //   const userToken = credentialResponse.credential;
+  //   const decodedCredential = jwt_decode(userToken);
+  //   console.log(`Logged in as ${decodedCredential.name}`);
+  //   post("/api/login", { token: userToken }).then((user) => {
+  //     setUserId(user._id);
+  //     post("/api/initsocket", { socketid: socket.id });
+  //   });
+  // };
+
+  // const handleLogout = () => {
+  //   setUserId(undefined);
+  //   post("/api/logout");
+  // };
+
 
   return (
     <>
-      <NavBar/>
+      <NavBar token={token}/>
       <Router>
         <Spotify path="/spotifyPage" />
         <NotFound default />

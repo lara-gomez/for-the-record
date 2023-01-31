@@ -28,6 +28,8 @@ dotenv.config();
 
 router.post("/login", auth.login);
 router.post("/logout", auth.logout);
+
+//changed for spotify
 router.get("/whoami", (req, res) => {
   if (!req.user) {
     // not logged in
@@ -55,7 +57,7 @@ router.post("/initsocket", (req, res) => {
 let access_token = ""; // initiate access token
 const spotify_client_id = process.env.SPOTIFY_CLIENT_ID;
 const spotify_client_secret = process.env.SPOTIFY_CLIENT_SECRET;
-const callback_uri = "https://fortherecord.herokuapp.com/api/spotify/callback";
+const callback_uri = "http://localhost:5050/api/spotify/callback";
 /**
  * Generates a secure random token (https://stackoverflow.com/questions/8855687/secure-random-token-in-node-js)
  */
@@ -112,7 +114,6 @@ router.get("/spotify/callback", (req, res) => {
   request.post(authOptions, function (error, response, body) {
     if (!error && response.statusCode === 200) {
       access_token = body.access_token; // this is the access token that you will use to send to the Spotify API anytime you send them an API call.
-      setCredentials(access_token);
       res.redirect("/"); // sends user back to the home page after a token is fetched. Up to you to change this to whatever path you want.
     }
   });
@@ -134,9 +135,13 @@ router.get("/spotify/token", (req, res) => {
 // |------------------------------|
 
 //logging in stuff
-// router.post("/setuser", (req, res) => {
-//   setCredentials(req.token);
-// });
+router.get("/spotify/id", (req, res) => {
+  setCredentials(req.token).then((spotifyId) => {
+    res.json({
+      userId: spotifyId,
+    });
+  });
+});
 
 function getOrCreateUser(user) {
   // the "sub" field means "subject", which is a unique identifier for each user
@@ -149,7 +154,8 @@ function getOrCreateUser(user) {
       profile_pic: user.images,
     });
 
-    return newUser.save();
+    newUser.save();
+    return user.spotify_id;
   });
 }
 
@@ -173,8 +179,43 @@ const setCredentials = (token) => {
       images: credentials.images,
     };
     console.log(userObj);
-    getOrCreateUser(userObj);
+    return getOrCreateUser(userObj);
   })
+};
+
+//song stuff
+function newSong(song) {
+  const newSong = new Song({
+    id: song.id,
+    likes: 0,
+    profile_pic: user.images,
+  });
+
+  newSong.save();
+};
+
+function likeSong(song){
+  // the "sub" field means "subject", which is a unique identifier for each user
+  return Song.findOne({ id: song.id }).then((song) => {
+    song.likes += 1;
+  });
+}
+
+function newReview(user, content){
+  const newReview = new Review({
+    creator_id: user.id,
+    content: review,
+    likes: 0,
+  });
+  return newReview.save()
+}
+
+function addReview(user, song, content){
+  return newReview(user, content).then((review) => {
+    return Song.findOne({ id: song.id }).then((song) => {
+      song.reviews.push(review);
+    });
+  });
 };
 
 // anything else falls to this "not found" case

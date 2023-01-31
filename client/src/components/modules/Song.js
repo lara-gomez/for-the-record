@@ -15,6 +15,24 @@ const Song = (props) => {
             <img src={props.image}/>
             <h1>{props.name}</h1>
             <h1>{props.artists}</h1>
+            <div> 
+                <span>Likes </span>
+                <span>
+                    <button type="button" className="SearchBar-button u-pointer">
+                        See Reviews
+                    </button>
+                </span>
+            {props.loggedIn && (
+                <input
+                type="search"
+                placeholder="See Reviews"
+                // onChange={handleChange}
+                className="SearchBar-input"
+                size="50"
+                required
+                />
+            )}
+            </div>
         </div>
     );
 };

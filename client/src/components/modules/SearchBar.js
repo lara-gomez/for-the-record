@@ -4,7 +4,7 @@ import Song from "./Song.js";
 import "./SearchBar.css";
 import "../../utilities.css";
 
-const SearchBar = () => {
+const SearchBar = (props) => {
   const [searchInput, setSearchInput] = useState("");
   const [songs, setSongs] = useState([]);
   const [token, setToken] = useState("");
@@ -24,17 +24,21 @@ const SearchBar = () => {
     }
     getToken();
   }, []);
-  //const [songs, setSongs] = useState([]);
+
   //event = user types in search box
   const handleChange = (e) => {
     setSearchInput(e.target.value);
+    if(e.target.value === ""){
+      setSongComponent(undefined);
+      setSongs([]);
+    }
   };
 
   //event = user presses submit
   const handleSubmit = (e) => {
     setSongComponent(undefined);
     getSong(searchInput);
-  };
+  }
 
   const getSong = async (songName) => {
     const url = `https://api.spotify.com/v1/search?q=${songName}&type=track&market=US`
@@ -99,6 +103,9 @@ const SearchBar = () => {
       <button type="submit" className="SearchBar-button u-pointer" value="Submit" onClick={handleSubmit}>
         Submit
       </button>
+      {songs == [] && 
+        <div className="site-description">search for songs. leave a review. share with friends.</div>
+      }
       <div className="Dropdown-container">
       {songs.map((song) => (
         <div>
@@ -108,6 +115,7 @@ const SearchBar = () => {
               name={song.name}
               artists={song.artists}
               image={song.image}
+              token={props.loggedIn}
             />
             )
             console.log(song);

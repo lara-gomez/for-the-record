@@ -27,3 +27,9 @@
   flex-wrap: wrap;
   align-content: center;
 }
+
+.site-description {
+  margin: 50px 0px 0px 0px;
+  font-family: "DM Serif Display", serif;
+  font-size: 30px;
+}
