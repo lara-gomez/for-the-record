@@ -22,45 +22,6 @@ const App = () => {
   const [token, setToken] = useState(null);
   const [refToken, setRefToken] = useState(null);
 
-  // useEffect(() => {
-  //   async function getToken() {
-  //     console.log("doing stuff");
-  //     const response = await fetch("/api/spotify/token");
-  //     const json = await response.json();
-  //     if (response.status === 200) {
-  //       setToken(json.access_token);
-  //       console.log(json.access_token);
-  //     } else {
-  //       console.log("error with token");
-  //     }
-  //   }
-  //   getToken();
-  // }, []);
-
-  // useEffect(() => {
-  //   get("/api/whoami").then((user) => {
-  //     if (user._id) {
-  //       // they are registed in the database, and currently logged in.
-  //       setUserId(user._id);
-  //     }
-  //   });
-  // }, []);
-
-  // const handleLogin = (credentialResponse) => {
-  //   const userToken = credentialResponse.credential;
-  //   const decodedCredential = jwt_decode(userToken);
-  //   console.log(`Logged in as ${decodedCredential.name}`);
-  //   post("/api/login", { token: userToken }).then((user) => {
-  //     setUserId(user._id);
-  //     post("/api/initsocket", { socketid: socket.id });
-  //   });
-  // };
-
-  // const handleLogout = () => {
-  //   setUserId(undefined);
-  //   post("/api/logout");
-  // };
-
   const handleLogin = (t, id, refT) => {
     setToken(t);
     setUserId(id);
@@ -69,9 +30,13 @@ const App = () => {
   };
 
   //create countdown
+  const refresh = async () => {
+    setRefToken(await get("/api/spotify/refresh_token", { refresh_token: refToken}));
+  };
 
   return (
     <>
+      {refresh}
       <NavBar handleLogin={handleLogin} token={token} userId={userId}/>
       <Router>
         <Spotify path="/spotifyPage" />

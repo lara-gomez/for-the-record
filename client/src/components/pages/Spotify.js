@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
+import { navigate } from "@reach/router";
+
 import "./Spotify.css";
 
 function Spotify(props) {
-  //const [token, setToken] = useState("");
 
   useEffect(() => {
     async function getToken() {
@@ -10,9 +11,9 @@ function Spotify(props) {
       const response = await fetch("/api/spotify/token");
       const json = await response.json();
       if (response.status === 200) {
-        //setToken(json.access_token);
         props.handleLogin(json.access_token, json.spotify_id, json.refresh_token)
         console.log("got token");
+        navigate("/feed");
       } else {
         console.log("error with token");
       }

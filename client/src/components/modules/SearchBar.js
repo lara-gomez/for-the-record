@@ -102,6 +102,7 @@ const SearchBar = (props) => {
               image={song.image}
               id={song.id}
               token={props.token}
+              userId={props.userId}
             />
             )
             console.log(song);

@@ -11,6 +11,8 @@ const express = require("express");
 
 // import models so we can interact with the database
 const User = require("./models/user");
+const Song = require("./models/song");
+const Review = require("./models/review");
 
 // import authentication library
 const auth = require("./auth");
@@ -122,7 +124,8 @@ router.get("/spotify/callback", (req, res) => {
   });
 });
 
-router.get('/refresh_token', function(req, res) {
+//refresh token
+router.get('/spotify/refresh_token', function(req, res) {
 
   // requesting access token from refresh token
   var refresh_token = req.query.refresh_token;
@@ -179,6 +182,14 @@ router.get("/spotify/user", (req, res) => {
   }
 });
 
+function getUser(user) {
+  // the "sub" field means "subject", which is a unique identifier for each user
+  return User.findOne({ spotify_id: user.spotify_id }).then((existingUser) => {
+    if (existingUser) return existingUser;
+    return null;
+  });
+}
+
 function getOrCreateUser(user) {
   // the "sub" field means "subject", which is a unique identifier for each user
   return User.findOne({ spotify_id: user.spotify_id }).then((existingUser) => {
@@ -188,18 +199,9 @@ function getOrCreateUser(user) {
       name: user.display_name,
       spotify_id: user.spotify_id,
       refreshToken: user.refreshToken,
-      //profile_pic: user.images,
     });
 
     newUser.save();
-  });
-}
-
-function getUser(user) {
-  // the "sub" field means "subject", which is a unique identifier for each user
-  return User.findOne({ spotify_id: user.spotify_id }).then((existingUser) => {
-    if (existingUser) return existingUser;
-    return null;
   });
 }
 
@@ -245,53 +247,69 @@ const getCredentials = async (token) => {
 }
 
 //song stuff
-router.get("/spotify/song"), (req, res) => {
-  getOrCreateSong(req.song);
-};
-
-function getOrCreateSong(song){
-  return Song.findOne({ id: song.id }).then((existingSong) => {
-    if(existingSong) return existingSong;
-
-    const newSong = new Song({
-      id: song.id,
+router.get("/song", (req, res) => {
+  return Song.findOne({ song_id: req.song_id }).then((existingSong) => {
+    if (existingSong)  res.send(existingSong);
+    else{
+      console.log(req.song_id);
+      const newSong = new Song({
+      song_id: req.song_id,
       likes: 0,
-      profile_pic: user.images,
+      reviews: [],
     });
-  
-    newSong.save();
-
+    newSong.save().then(() => {
+      res.send(newSong);
+    });
+    }
   });
-};
+});
 
-router.post("/spotify/like"), (req, res) => {
+function getOrCreateSong(song) {
+  // the "sub" field means "subject", which is a unique identifier for each user
+  return User.findOne({ spotify_id: user.spotify_id }).then((existingUser) => {
+    if (existingUser) return existingUser;
+
+    const newUser = new User({
+      name: user.display_name,
+      spotify_id: user.spotify_id,
+      refreshToken: user.refreshToken,
+    });
+
+    newUser.save();
+  });
+}
+
+router.post("/like", (req, res) => {
   likeSong(req.body.song);
-};
+});
 
 function likeSong(song){
   // the "sub" field means "subject", which is a unique identifier for each user
-  return Song.findOne({ id: song.id }).then((song) => {
+  return Song.findOne({ song_id: song.id }).then((song) => {
     song.likes += 1;
   });
 }
 
-function newReview(user, content){
-  const newReview = new Review({
-    creator_id: user.id,
-    content: review,
-    likes: 0,
+router.get("/review", (req, res) => {
+  Review.findOne({parent : req.parent}).then((rev) => {
+    res.send(rev);
   });
-  return newReview.save()
-}
+});
 
-function addReview(user, song, content){
-  return newReview(user, content).then((review) => {
-    return Song.findOne({ id: song.id }).then((song) => {
+router.post("/review", (req, res) => {
+  const newReview = new Review({
+    creator_id: req.body.user_id,
+    content: req.body.content,
+  });
+  newReview.save().then((review) => {
+    res.send(review);
+    Song.findOne({ song_id: req.body.song_id }).then((song) => {
+      console.log(song);
       song.reviews.push(review._id);
       song.save();
     });
   });
-};
+});
 
 // anything else falls to this "not found" case
 
