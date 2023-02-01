@@ -18,22 +18,24 @@ import { get, post } from "../utilities";
  * Define the "App" component
  */
 const App = () => {
-  const [userId, setUserId] = useState(undefined);
+  const [userId, setUserId] = useState(null);
   const [token, setToken] = useState(null);
+  const [refToken, setRefToken] = useState(null);
 
-  useEffect(() => {
-    async function getToken() {
-      console.log("doing stuff");
-      const response = await fetch("/api/spotify/token");
-      const json = await response.json();
-      if (response.status === 200) {
-        setToken(json.access_token);
-        console.log(json.access_token);
-      } else {
-        console.log("error with token");
-      }
-    }
-  }, []);
+  // useEffect(() => {
+  //   async function getToken() {
+  //     console.log("doing stuff");
+  //     const response = await fetch("/api/spotify/token");
+  //     const json = await response.json();
+  //     if (response.status === 200) {
+  //       setToken(json.access_token);
+  //       console.log(json.access_token);
+  //     } else {
+  //       console.log("error with token");
+  //     }
+  //   }
+  //   getToken();
+  // }, []);
 
   // useEffect(() => {
   //   get("/api/whoami").then((user) => {
@@ -59,15 +61,23 @@ const App = () => {
   //   post("/api/logout");
   // };
 
+  const handleLogin = (t, id, refT) => {
+    setToken(t);
+    setUserId(id);
+    setRefToken(refT);
+    console.log(t, id, refT);
+  };
+
+  //create countdown
 
   return (
     <>
-      <NavBar token={token}/>
+      <NavBar handleLogin={handleLogin} token={token} userId={userId}/>
       <Router>
         <Spotify path="/spotifyPage" />
         <NotFound default />
-        <Home path="/"/>
-        <Feed path="/feed"/>
+        <Home path="/" token={token} userId={userId}/>
+        <Feed path="/feed" token={token} userId={userId}/>
       </Router>
     </>
   );

@@ -3,14 +3,8 @@ const { internalIP } = require("webpack-dev-server");
 
 const SongSchema = new mongoose.Schema({
   id: String,
-  //parent: String, //parent is albums
-  likes: integer,
-  reviews: Array,
-  // album: {
-  //   type: String,
-  //   ref: "Albums",
-  // },
-  // title: String,
+  likes: Number,
+  reviews: [String],
 });
 
 // compile model from schema

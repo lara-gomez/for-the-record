@@ -7,23 +7,7 @@ import "../../utilities.css";
 const SearchBar = (props) => {
   const [searchInput, setSearchInput] = useState("");
   const [songs, setSongs] = useState([]);
-  const [token, setToken] = useState("");
   const [songComponent, setSongComponent] = useState(undefined);
-  //check if token expired
-  useEffect(() => {
-    async function getToken() {
-      console.log("doing stuff");
-      const response = await fetch("/api/spotify/token");
-      const json = await response.json();
-      if (response.status === 200) {
-        setToken(json.access_token);
-        console.log("got token");
-      } else {
-        console.log("error with token");
-      }
-    }
-    getToken();
-  }, []);
 
   //event = user types in search box
   const handleChange = (e) => {
@@ -47,7 +31,7 @@ const SearchBar = (props) => {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${props.token}`
       }
       // eslint-disable-next-line arrow-parens
     }).then(async (spotifyServerResponse) => {
@@ -82,6 +66,7 @@ const SearchBar = (props) => {
           name: track.name,
           artists: artists,
           image: track.album.images[0].url,
+          id: track.id,
         });
       }
       setSongs(tracks);
@@ -103,19 +88,20 @@ const SearchBar = (props) => {
       <button type="submit" className="SearchBar-button u-pointer" value="Submit" onClick={handleSubmit}>
         Submit
       </button>
-      {songs == [] && 
+      {songs.length === 0 && 
         <div className="site-description">search for songs. leave a review. share with friends.</div>
       }
       <div className="Dropdown-container">
       {songs.map((song) => (
         <div>
-          <button type="button" onClick={() => {
+          <button type="button" onClick={async () => {
             setSongComponent(
             <Song
               name={song.name}
               artists={song.artists}
               image={song.image}
-              token={props.loggedIn}
+              id={song.id}
+              token={props.token}
             />
             )
             console.log(song);

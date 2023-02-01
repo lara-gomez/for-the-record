@@ -3,9 +3,7 @@ const mongoose = require("mongoose");
 const UserSchema = new mongoose.Schema({
   name: String,
   spotify_id: String,
-  // spotify_secret: String,
-  // spotify_token: String,
-  profile_pic: String,
+  refreshToken: String,
 });
 
 // compile model from schema

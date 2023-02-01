@@ -7,7 +7,7 @@ import "./Feed.css";
 const Feed = (props) => {
     return(
         <div>
-            <SearchBar loggedIn={true}/>
+            <SearchBar token={props.token} userId={props.userId}/>
         </div>
     );
 };

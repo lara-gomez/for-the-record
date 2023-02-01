@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const ReviewSchema = new mongoose.Schema({
   creator_id: String,
   content: String,
-  //likes: ,
+  likes: Number,
 });
 
 // compile model from schema

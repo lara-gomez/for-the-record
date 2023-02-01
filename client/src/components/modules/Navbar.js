@@ -11,7 +11,23 @@ import "../../utilities.css";
  */
 
 const NavBar = (props) => {
-const [userId, setUserId] = useState(undefined);
+// const [userId, setUserId] = useState(undefined);
+// const [token, setToken] = useState(null);
+
+// const createToken = (e) => {
+//   async function getToken() {
+//     console.log("doing stuff");
+//     const response = await fetch("/api/spotify/token");
+//     const json = await response.json();
+//     if (response.status === 200) {
+//       setToken(json.access_token);
+//       console.log(json.access_token);
+//     } else {
+//       console.log("error with token");
+//     }
+//   }
+//   getToken();
+// };
 
   return (
     <nav className="NavBar-container">
@@ -20,9 +36,9 @@ const [userId, setUserId] = useState(undefined);
           <Link to="/feed" className="NavBar-link">
           Feed
           </Link>
-          ) : (
-          <Spotify className="NavBar-link"/>
-          )}
+        ) : (
+          <Spotify handleLogin={props.handleLogin}/>
+        )}
       </div>
       {/* <div className="u-inlineBlock">test</div> */}
     </nav>

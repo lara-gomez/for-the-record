@@ -6,6 +6,7 @@ import "./Song.css";
  *
  * Proptypes
  * @param {String} name is the name of the song
+ * @param {String} id
  * @param {String} artists are the names of the artists
  * @param {String} image is link to track cover
  */
@@ -22,10 +23,10 @@ const Song = (props) => {
                         See Reviews
                     </button>
                 </span>
-            {props.loggedIn && (
+            {props.token && (
                 <input
                 type="search"
-                placeholder="See Reviews"
+                placeholder="Review Here"
                 // onChange={handleChange}
                 className="SearchBar-input"
                 size="50"

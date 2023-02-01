@@ -55,6 +55,7 @@ router.post("/initsocket", (req, res) => {
 // In this example, my frontend port is 5050. It may be yours as well since i just used the default weblab skeleton.
 
 let access_token = ""; // initiate access token
+let refresh_token = "";
 const spotify_client_id = process.env.SPOTIFY_CLIENT_ID;
 const spotify_client_secret = process.env.SPOTIFY_CLIENT_SECRET;
 const callback_uri = "http://localhost:5050/api/spotify/callback";
@@ -114,7 +115,33 @@ router.get("/spotify/callback", (req, res) => {
   request.post(authOptions, function (error, response, body) {
     if (!error && response.statusCode === 200) {
       access_token = body.access_token; // this is the access token that you will use to send to the Spotify API anytime you send them an API call.
-      res.redirect("/"); // sends user back to the home page after a token is fetched. Up to you to change this to whatever path you want.
+      refresh_token = body.refresh_token;
+      setCredentials(access_token, refresh_token);
+      res.redirect("/feed"); // sends user back to the home page after a token is fetched. Up to you to change this to whatever path you want.
+    }
+  });
+});
+
+router.get('/refresh_token', function(req, res) {
+
+  // requesting access token from refresh token
+  var refresh_token = req.query.refresh_token;
+  var authOptions = {
+    url: 'https://accounts.spotify.com/api/token',
+    headers: { 'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64')) },
+    form: {
+      grant_type: 'refresh_token',
+      refresh_token: refresh_token
+    },
+    json: true
+  };
+
+  request.post(authOptions, function(error, response, body) {
+    if (!error && response.statusCode === 200) {
+      var access_token = body.access_token;
+      res.send({
+        'access_token': access_token
+      });
     }
   });
 });
@@ -123,11 +150,18 @@ router.get("/spotify/callback", (req, res) => {
  * Called as soon as someone opens up localhost:5050/spotifyPage in order to check if there is an access token available on the server.
  * You can use this to render different things and check if someone has logged in on the front end.
  */
-router.get("/spotify/token", (req, res) => {
-  console.log("token page");
-  res.json({
-    access_token: access_token,
-  });
+router.get("/spotify/token", async (req, res) => {
+  if(access_token.length > 1){
+    const id = await getCredentials(access_token);
+    res.json({
+      access_token: access_token,
+      refresh_token: refresh_token,
+      spotify_id: id,
+    });
+  }
+  else{
+    res.status(400);
+  }
 });
 
 // |------------------------------|
@@ -135,12 +169,14 @@ router.get("/spotify/token", (req, res) => {
 // |------------------------------|
 
 //logging in stuff
-router.get("/spotify/id", (req, res) => {
-  setCredentials(req.token).then((spotifyId) => {
-    res.json({
-      userId: spotifyId,
-    });
-  });
+router.get("/spotify/user", (req, res) => {
+  const user = getUser(req.userId);
+  if(user){
+    res.send(user);
+  }
+  else{
+    res.status(500);
+  }
 });
 
 function getOrCreateUser(user) {
@@ -150,16 +186,24 @@ function getOrCreateUser(user) {
 
     const newUser = new User({
       name: user.display_name,
-      spotify_id: user.id,
-      profile_pic: user.images,
+      spotify_id: user.spotify_id,
+      refreshToken: user.refreshToken,
+      //profile_pic: user.images,
     });
 
     newUser.save();
-    return user.spotify_id;
   });
 }
 
-const setCredentials = (token) => {
+function getUser(user) {
+  // the "sub" field means "subject", which is a unique identifier for each user
+  return User.findOne({ spotify_id: user.spotify_id }).then((existingUser) => {
+    if (existingUser) return existingUser;
+    return null;
+  });
+}
+
+const setCredentials = (token, refToken) => {
   const url = `https://api.spotify.com/v1/me`
   const credentials = fetch(url, {
     method: 'GET',
@@ -175,23 +219,53 @@ const setCredentials = (token) => {
     console.log(credentials);
     userObj = {
       display_name: credentials.display_name,
-      id: credentials.id,
-      images: credentials.images,
+      spotify_id: credentials.id,
+      refreshToken: refToken,
+      //images: credentials.images,
     };
     console.log(userObj);
-    return getOrCreateUser(userObj);
+    getOrCreateUser(userObj);
   })
 };
 
-//song stuff
-function newSong(song) {
-  const newSong = new Song({
-    id: song.id,
-    likes: 0,
-    profile_pic: user.images,
+const getCredentials = async (token) => {
+  const url = `https://api.spotify.com/v1/me`
+  const credentials = await fetch(url, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    }
+    // eslint-disable-next-line arrow-parens
   });
+  const parsedCred = await credentials.json();
+  return parsedCred.id;
+  
+}
 
-  newSong.save();
+//song stuff
+router.get("/spotify/song"), (req, res) => {
+  getOrCreateSong(req.song);
+};
+
+function getOrCreateSong(song){
+  return Song.findOne({ id: song.id }).then((existingSong) => {
+    if(existingSong) return existingSong;
+
+    const newSong = new Song({
+      id: song.id,
+      likes: 0,
+      profile_pic: user.images,
+    });
+  
+    newSong.save();
+
+  });
+};
+
+router.post("/spotify/like"), (req, res) => {
+  likeSong(req.body.song);
 };
 
 function likeSong(song){
@@ -213,7 +287,8 @@ function newReview(user, content){
 function addReview(user, song, content){
   return newReview(user, content).then((review) => {
     return Song.findOne({ id: song.id }).then((song) => {
-      song.reviews.push(review);
+      song.reviews.push(review._id);
+      song.save();
     });
   });
 };
