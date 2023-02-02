@@ -16,7 +16,8 @@
   "license": "ISC",
   "homepage": "",
   "engines": {
-    "node": ">=18.x"
+    "node": ">=18.x",
+    "npm": "18.13.0"
   },
   "dependencies": {
     "@reach/router": "^1.3.4",
