@@ -60,7 +60,7 @@ let access_token = ""; // initiate access token
 let refresh_token = "";
 const spotify_client_id = process.env.SPOTIFY_CLIENT_ID;
 const spotify_client_secret = process.env.SPOTIFY_CLIENT_SECRET;
-const callback_uri = "http://localhost:5050/api/spotify/callback";
+const callback_uri = "https://fortherecord.herokuapp.com/api/spotify/callback";
 /**
  * Generates a secure random token (https://stackoverflow.com/questions/8855687/secure-random-token-in-node-js)
  */
