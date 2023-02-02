@@ -8,29 +8,30 @@ import "./Song.css";
  * Proptypes
  * @param {String} name is the name of the song
  * @param {String} id
- * @param {String} artists are the names of the artists
+ * @param {Array} artists are the names of the artists
  * @param {String} image is link to track cover
  */
 const Song = (props) => {
     const [searchInput, setSearchInput] = useState("");
+    const [likeButton, setLikeButton] = useState("Like");
     const [likes, setLikes] = useState(null);
     const [reviews, setReviews] = useState([]);
     const [seeReviews, setSeeReviews] = useState(false);
 
-    // const setSong = (async() => {
-    //     const userObj = await get("/spotify/api/song", {song_id: props.id});
-    //     console.log(userObj);
-    //     setLikes(userObj);
-    // });
-
     useEffect(() => {
         console.log(props.id);
-        get("/api/song", { song_id: props.id }).then((songObj) => {
+        get("/api/song", {song_id: props.id}).then((songObj) => {
             setLikes(songObj.likes);
             const review_ids = songObj.reviews;
             let revs = [];
             for(let i = 0; i < review_ids.length; i++){
-
+                get("/api/review", {id : review_ids[i]}).then((review) => {
+                    revs.push(review);
+                });
+            }
+            setReviews(revs);
+            if(songObj.likedBy.includes(props.userId)){
+                setLikeButton("Dislike");
             }
             console.log(songObj);
         });
@@ -52,12 +53,32 @@ const Song = (props) => {
         post("/api/review", body).then((review) => {
             setReviews([review].concat(reviews));
         });
+        setSearchInput("");
     }
   };
 
   const setRevs = () => {
-    console.log("revs", seeReviews)
-    setSeeReviews(true);
+    if(seeReviews === false){
+        setSeeReviews(true);
+    }
+    else{
+        setSeeReviews(false);
+    }
+  };
+
+  const like = (e) => {
+    if(likeButton === "Like"){
+        setLikeButton("Dislike");
+        setLikes(likes + 1);
+        const body = {song_id: props.id, user_id: props.userId, like: true};
+        post("/api/like", body);
+    }
+    else{
+        setLikeButton("Like");
+        setLikes(likes - 1);
+        const body = {song_id: props.id, user_id: props.userId, like: false};
+        post("/api/like", body);
+    }
   };
 
     return(
@@ -66,7 +87,10 @@ const Song = (props) => {
             <h1>{props.name}</h1>
             <h1>{props.artists}</h1>
             <div> 
-                <span>{likes} Likes </span>
+                <span>
+                    <button type="submit" onClick={like}>{likeButton}</button>
+                    <div>{likes}</div>
+                </span>
             {!seeReviews ? (
                 <span>
                 <button type="button" className="SearchBar-button u-pointer" onClick={setRevs}>
@@ -77,16 +101,25 @@ const Song = (props) => {
                 <>
                 {reviews.map((rev) => (
                     <div>{rev.content} | {rev.creator_id}</div> 
-                ))};
-                <input
-                type="search"
-                placeholder="Leave Review"
-                onChange={handleChange}
-                className="SearchBar-input"
-                size="50"
-                required
-                />
-                <button type="button" onClick={handleSubmit}>Submit</button>
+                ))}
+                <span>
+                    <button type="button" className="SearchBar-button u-pointer" onClick={setRevs}>
+                        Close Reviews
+                    </button>
+                </span>
+                {props.token && (
+                    <>
+                    <input
+                    type="input"
+                    placeholder="Leave Review"
+                    onChange={handleChange}
+                    className="SearchBar-input"
+                    size="50"
+                    required
+                    />
+                    <button type="button" onClick={handleSubmit}>Submit</button>
+                    </>
+                )}
                 </>
             )}
             </div>

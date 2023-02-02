@@ -11,7 +11,7 @@ function Spotify(props) {
       const response = await fetch("/api/spotify/token");
       const json = await response.json();
       if (response.status === 200) {
-        props.handleLogin(json.access_token, json.spotify_id, json.refresh_token)
+        props.handleLogin(json.access_token, json.spotify_id, json.refresh_token);
         console.log("got token");
         navigate("/feed");
       } else {

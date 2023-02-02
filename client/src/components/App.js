@@ -31,18 +31,23 @@ const App = () => {
 
   //create countdown
   const refresh = async () => {
-    setRefToken(await get("/api/spotify/refresh_token", { refresh_token: refToken}));
+    setToken(await get("/api/spotify/refresh_token", { refresh_token: refToken}));
+    console.log("New Token");
   };
+  const check = () => {
+    setInterval(refresh, 3599999);
+  };
+
 
   return (
     <>
-      {refresh}
+      {token && check(refresh)}
       <NavBar handleLogin={handleLogin} token={token} userId={userId}/>
       <Router>
         <Spotify path="/spotifyPage" />
         <NotFound default />
-        <Home path="/" token={token} userId={userId}/>
-        <Feed path="/feed" token={token} userId={userId}/>
+        <Home path="/" token={token} userId={userId} />
+        <Feed path="/feed" token={token} userId={userId} />
       </Router>
     </>
   );

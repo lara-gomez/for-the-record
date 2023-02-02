@@ -131,7 +131,7 @@ router.get('/spotify/refresh_token', function(req, res) {
   var refresh_token = req.query.refresh_token;
   var authOptions = {
     url: 'https://accounts.spotify.com/api/token',
-    headers: { 'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64')) },
+    headers: { 'Authorization': 'Basic ' + (new Buffer.from(spotify_client_id + ':' + spotify_client_secret).toString('base64')) },
     form: {
       grant_type: 'refresh_token',
       refresh_token: refresh_token
@@ -248,50 +248,49 @@ const getCredentials = async (token) => {
 
 //song stuff
 router.get("/song", (req, res) => {
-  return Song.findOne({ song_id: req.song_id }).then((existingSong) => {
-    if (existingSong)  res.send(existingSong);
+  return Song.findOne({ song_id: req.query.song_id }).then((existingSong) => {
+    if (existingSong){
+      console.log("existingSong", existingSong);
+      res.send(existingSong);
+    }
     else{
       console.log(req.song_id);
       const newSong = new Song({
-      song_id: req.song_id,
-      likes: 0,
-      reviews: [],
-    });
-    newSong.save().then(() => {
-      res.send(newSong);
-    });
+        song_id: req.query.song_id,
+        likes: 0,
+        likedBy: [],
+        reviews: [],
+      });
+
+      newSong.save().then(() => {
+        console.log("newSong", newSong.song_id);
+        res.send(newSong);
+      });
     }
   });
 });
 
-function getOrCreateSong(song) {
-  // the "sub" field means "subject", which is a unique identifier for each user
-  return User.findOne({ spotify_id: user.spotify_id }).then((existingUser) => {
-    if (existingUser) return existingUser;
-
-    const newUser = new User({
-      name: user.display_name,
-      spotify_id: user.spotify_id,
-      refreshToken: user.refreshToken,
-    });
-
-    newUser.save();
-  });
-}
-
 router.post("/like", (req, res) => {
-  likeSong(req.body.song);
+  console.log(req.body.song_id);
+  console.log(req.body.like);
+  return Song.findOne({ song_id: req.body.song_id }).then((song) => {
+    console.log(song);
+    if(req.body.like){
+      song.likes += 1;
+      song.likedBy.push(req.body.user_id);
+    }
+    else{
+      song.likes -= 1;
+      song.likedBy.splice(song.likedBy.indexOf(req.body.user_id));
+    }
+    song.save();
+  });
 });
 
-function likeSong(song){
-  // the "sub" field means "subject", which is a unique identifier for each user
-  return Song.findOne({ song_id: song.id }).then((song) => {
-    song.likes += 1;
-  });
-}
-
 router.get("/review", (req, res) => {
-  Review.findOne({parent : req.parent}).then((rev) => {
+  Review.findOne({_id : req.query.id}).then((rev) => {
+    console.log(req.query.id);
+    console.log(rev);
     res.send(rev);
   });
 });

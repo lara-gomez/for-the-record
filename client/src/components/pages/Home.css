@@ -16,3 +16,9 @@
   width: 80%;
   margin: 0 px 0px 15px 0px;
 }
+
+.site-description {
+  margin: 50px 0px 0px 0px;
+  font-family: "DM Serif Display", serif;
+  font-size: 30px;
+}

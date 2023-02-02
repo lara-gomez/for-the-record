@@ -67,6 +67,7 @@ const SearchBar = (props) => {
           artists: artists,
           image: track.album.images[0].url,
           id: track.id,
+          showing: false,
         });
       }
       setSongs(tracks);
@@ -77,6 +78,7 @@ const SearchBar = (props) => {
 
   return (
     <div className="u-textCenter SearchBar-position">
+      <img src="logo.png" className="logo" />
       <input
         type="search"
         placeholder="Search Song Here"
@@ -94,7 +96,7 @@ const SearchBar = (props) => {
       <div className="Dropdown-container">
       {songs.map((song) => (
         <div>
-          <button type="button" onClick={async () => {
+          <button type="button" onClick={ () => {
             setSongComponent(
             <Song
               name={song.name}
